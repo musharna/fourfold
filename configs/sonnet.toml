@@ -1,0 +1,7 @@
+# claude-sonnet-5-5 via `claude -p` on the logged-in plan (CLI-scaffolded; see prereg/P0.md)
+agent = "claude-cli"
+ticks = 50
+[claude_cli]
+model = "claude-sonnet-5-5"
+effort = "medium"
+max_concurrency = 9
