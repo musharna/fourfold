@@ -283,14 +283,14 @@ def main():
     ticks = [l for l in lines if l.get("type") == "tick"]
     if args.tick is not None:
         ticks = [r for r in ticks if r["t"] <= args.tick]
-    if not ticks:
+    if not ticks and args.tick != 0:   # --tick 0 = zero-information floor (fresh states)
         sys.exit("no ticks to evaluate")
     eval_tpl = (ROOT / "prompts" / "eval.txt").read_text(encoding="utf-8")
     if args.naming:
         naming_report(meta, ticks)
         return
 
-    t = ticks[-1]["t"]
+    t = ticks[-1]["t"] if ticks else 0
     out = path.parent / f"eval-t{t}.json"
     scored = []
     if args.rescore:
