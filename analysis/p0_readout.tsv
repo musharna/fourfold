@@ -9,8 +9,12 @@ p0-solcx-nocue-1001	17	153	144	0.941	0	9	True	None	None	0	None	0	None	None
 p0-sonnet-cued-1001	50	450	439	0.976	8	3	False	0.104	0.104	9	0.089	0	None	None
 p0-sonnet-cued-1002	50	450	435	0.967	14	1	False	0.119	0.119	9	None	0	None	None
 p0-sonnet-cued-1003	50	450	396	0.88	52	2	True	0.099	0.111	8	None	0	None	None
-p0-sonnet-cued-1004	49	441	370	0.839	70	1	True	None	None	0	None	0	None	None
+p0-sonnet-cued-1004	50	450	377	0.838	72	1	True	0.127	0.127	9	None	0	None	None
+p0-sonnet-cued-1005	50	450	363	0.807	85	2	True	0.118	0.118	9	None	0	None	None
+p0-sonnet-cued-1006	50	450	365	0.811	64	21	True	0.105	0.105	9	None	0	None	None
 p0-sonnet-nocue-1001	50	450	346	0.769	101	3	True	0.094	0.094	9	0.089	0	None	None
 p0-sonnet-nocue-1002	50	450	376	0.836	67	7	True	0.128	0.128	9	None	0	None	None
 p0-sonnet-nocue-1003	50	450	274	0.609	172	4	True	0.129	0.129	9	None	0	None	None
-p0-sonnet-nocue-1004	2	18	18	1.0	0	0	True	None	None	0	None	0	None	None
+p0-sonnet-nocue-1004	50	450	353	0.784	96	1	True	0.107	0.107	9	None	0	None	None
+p0-sonnet-nocue-1005	50	450	333	0.74	115	2	True	0.109	0.109	9	None	0	None	None
+p0-sonnet-nocue-1006	6	54	44	0.815	9	1	True	None	None	0	None	0	None	None
