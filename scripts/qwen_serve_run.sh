@@ -14,7 +14,7 @@ rc=1
 for port in ${QWEN_PORTS:-8743 8757 8769}; do
   cfg=$LAB/runs/qwen-port$port.toml
   mkdir -p "$LAB/runs"
-  sed "s#http://127.0.0.1:8731/v1#http://127.0.0.1:$port/v1#" "$LAB/configs/qwen.toml" > "$cfg"
+  sed "s#http://127.0.0.1:8731/v1#http://127.0.0.1:$port/v1#" "$LAB/${QWEN_CFG:-configs/qwen.toml}" > "$cfg"
   grep -q "127.0.0.1:$port/v1" "$cfg" || { echo "config rewrite failed for port $port" >&2; exit 3; }
   echo "== attempt port $port"
   set +e
