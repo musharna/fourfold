@@ -72,6 +72,14 @@ DEFAULTS = {
         "price_in_per_m": None,     # usd per 1M prompt tokens, used for cost_cap_usd when the
         "price_out_per_m": None,    # provider does not report usage.cost itself
     },
+    "codex_cli": {                  # agent = "codex-cli": `codex exec` on the ChatGPT plan, jailed
+        "jail": "scripts/codex_jail.sh",
+        "model": "gpt-6.1-sol",
+        "effort": "high",
+        "timeout": 900,
+        "retries": 3,
+        "max_concurrency": 9,
+    },
     "claude_cli": {                 # agent = "claude-cli": `claude -p`, billed to the logged-in plan
         "bin": "claude",
         "model": "claude-opus-5-5",
@@ -672,6 +680,85 @@ class ClaudeCLIAgent:
         pass
 
 
+class CodexCLIAgent:
+    """`codex exec` as the backend, billed to the logged-in ChatGPT plan. each call runs in a
+    bubblewrap jail (scripts/codex_jail.sh) that sees only system files, the codex install, the
+    plan's auth.json and a FRESH empty work dir (deleted after the call), so no run file is
+    readable and nothing persists between ticks. codex is a coding agent: ~10k tokens of its own
+    instructions/tool specs ride along and the model may run shell commands inside the jail
+    (counted in usage.commands). so these runs are codex-scaffolded, not bare api calls."""
+
+    def __init__(self, cfg: dict):
+        self.cfg = cfg
+        self.jail = str((ROOT / cfg["jail"]).resolve())
+        if not os.access(self.jail, os.X_OK):
+            sys.exit(f"config: codex jail script not executable: {self.jail}")
+        self.sem = asyncio.Semaphore(int(cfg["max_concurrency"]))
+
+    async def _once(self, turn: Turn) -> tuple[Reply | None, str | None]:
+        import shutil
+        import tempfile
+        work = tempfile.mkdtemp(prefix="cx")
+        try:
+            Path(work, "sys.txt").write_text(turn.system, encoding="utf-8")
+            cmd = [self.jail, work, "exec", "--ephemeral", "--skip-git-repo-check",
+                   "-s", "danger-full-access", "-C", "/work", "-m", self.cfg["model"],
+                   "-c", "model_instructions_file=/work/sys.txt",
+                   "-c", f"model_reasoning_effort={self.cfg['effort']}", "--json", turn.prompt]
+            proc = await asyncio.create_subprocess_exec(
+                *cmd, stdin=asyncio.subprocess.DEVNULL, stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE)
+            try:
+                out, err = await asyncio.wait_for(proc.communicate(), timeout=float(self.cfg["timeout"]))
+            except asyncio.TimeoutError:
+                proc.kill()
+                return None, f"timeout after {self.cfg['timeout']}s"
+        finally:
+            shutil.rmtree(work, ignore_errors=True)
+        text, thoughts, usage, problems, commands = [], [], {}, [], 0
+        for line in out.decode("utf-8", "replace").splitlines():
+            try:
+                e = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            t, it = e.get("type"), e.get("item") or {}
+            if t == "item.completed" and it.get("type") == "agent_message":
+                text.append(it.get("text") or "")
+            elif t == "item.completed" and it.get("type") == "reasoning":
+                thoughts.append(it.get("text") or "")
+            elif t == "item.completed" and it.get("type") == "command_execution":
+                commands += 1
+            elif t == "turn.completed":
+                usage = dict(e.get("usage") or {})
+            elif t in ("error", "turn.failed"):
+                problems.append(json.dumps(e)[:400])
+        usage["commands"] = commands
+        if problems and not text:
+            msg = " | ".join(problems)
+            if re.search(r"usage limit|rate limit|quota|limit reached|too many requests", msg, re.I):
+                return Reply(error=f"codex-cli usage limit: {msg}", usage=usage), None
+            return None, f"rc={proc.returncode} {msg} stderr {err[-300:]!r}"
+        if not text:
+            return None, f"rc={proc.returncode} no agent message; stderr {err[-300:]!r}"
+        return Reply(raw=text[-1], reasoning="\n\n".join(x for x in thoughts if x) or None,
+                     usage=usage), None
+
+    async def act(self, turn: Turn) -> Reply:
+        if turn.images:
+            return Reply(error="codex-cli backend does not support pixels mode")
+        last = None
+        async with self.sem:
+            for attempt in range(int(self.cfg["retries"]) + 1):
+                rep, last = await self._once(turn)
+                if rep is not None:
+                    return rep
+                await asyncio.sleep(min(30, 2 ** attempt))
+        return Reply(error=f"codex-cli failed after retries: {last}")
+
+    async def close(self):
+        pass
+
+
 def make_agent(cfg: dict):
     if cfg["agent"] == "echo":
         return EchoAgent(cfg["echo"])
@@ -681,6 +768,8 @@ def make_agent(cfg: dict):
         return AnthropicAgent(cfg["anthropic"])
     if cfg["agent"] == "claude-cli":
         return ClaudeCLIAgent(cfg["claude_cli"])
+    if cfg["agent"] == "codex-cli":
+        return CodexCLIAgent(cfg["codex_cli"])
     sys.exit(f"config: unknown agent kind {cfg['agent']!r}")
 
 
@@ -904,7 +993,7 @@ def main():
     ap.add_argument("--ticks", type=int, help="run until this tick number")
     ap.add_argument("--run-id", help="name for a new run")
     ap.add_argument("--resume", metavar="RUN", help="run id or path of a run to continue")
-    ap.add_argument("--agent", choices=["llm", "anthropic", "claude-cli", "echo"], help="override agent kind for a new run")
+    ap.add_argument("--agent", choices=["llm", "anthropic", "claude-cli", "codex-cli", "echo"], help="override agent kind for a new run")
     ap.add_argument("--world-seed", type=int, help="override world seed for a new run")
     ap.add_argument("--view", action="store_true", help="also open the viewer, following this run live")
     args = ap.parse_args()

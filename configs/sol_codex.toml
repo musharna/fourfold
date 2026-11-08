@@ -1,0 +1,7 @@
+# gpt-6.1-sol via `codex exec` on the ChatGPT Plus plan, jailed (scripts/codex_jail.sh); codex-scaffolded
+agent = "codex-cli"
+ticks = 50
+[codex_cli]
+model = "gpt-6.1-sol"
+effort = "high"
+max_concurrency = 9
