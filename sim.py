@@ -870,6 +870,8 @@ async def run(path: Path, meta: dict, states: list[AgentState], start: int, end:
                 if cap is not None and cfg["agent"] == "llm":
                     for a in rec["agents"]:
                         u = a.get("usage") or {}
+                        if not u:                              # failed call: nothing billed
+                            continue
                         if u.get("cost") is not None:          # openrouter reports billed cost
                             spent += float(u["cost"])
                         elif pin is not None and pout is not None:
