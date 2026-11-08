@@ -20,7 +20,10 @@ for port in ${QWEN_PORTS:-8743 8757 8769}; do
   set +e
   ( cd "$ZOO" && ZOO_PORT=$port ZOO_GPU_UTIL=${ZOO_GPU_UTIL:-0.70} serve/with_vllm.sh Qwen/Qwen3.5-9B \
       --language-model-only --reasoning-parser qwen3 --max-num-seqs 16 -- \
-      bash -c "cd '$LAB' && .venv/bin/python sim.py --config '$cfg' $*" )
+      bash -c "cd '$LAB' && $(if [[ ${1:-} == --arm ]]; then
+        # --arm <label> <seeds...>: full arm + eval via run_arm.sh, then the F0 floor on the first seed
+        echo "bash scripts/run_arm.sh '$cfg' ${*:2} && .venv/bin/python eval.py p0-$2-$3 --tick 0 > runs/p0-$2-$3.F0.txt"
+      else echo ".venv/bin/python sim.py --config '$cfg' $*"; fi)" )
   rc=$?
   set -e
   echo "== port $port exit $rc"
