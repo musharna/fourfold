@@ -57,6 +57,8 @@ DEFAULTS = {
     "pixel_scale": 16,              # pixels mode: screen pixels per image pixel in what the agent sees
     "task": "",                     # "" or "naming": a point per input port that equals your q0
     "byte_ban": None,               # e.g. [0x20, 0x7e]: output bytes in this range are rejected
+    "system_prompt": "system.txt",  # file in prompts/ used as the system prompt (e.g. system_nocue.txt)
+    "cost_cap_usd": None,           # llm backend: stop the run once reported/estimated spend passes this
     "llm": {
         "base_url": "http://localhost:8000/v1",
         "model": "",
@@ -67,6 +69,16 @@ DEFAULTS = {
         "retries": 3,
         "max_concurrency": 9,
         "extra_body": {},
+        "price_in_per_m": None,     # usd per 1M prompt tokens, used for cost_cap_usd when the
+        "price_out_per_m": None,    # provider does not report usage.cost itself
+    },
+    "claude_cli": {                 # agent = "claude-cli": `claude -p`, billed to the logged-in plan
+        "bin": "claude",
+        "model": "claude-opus-5-5",
+        "effort": "medium",
+        "timeout": 600,
+        "retries": 3,
+        "max_concurrency": 9,
     },
     "anthropic": {
         "model": "claude-opus-5-5",
@@ -597,6 +609,69 @@ class AnthropicAgent:
         await self.client.close()
 
 
+class ClaudeCLIAgent:
+    """claude code cli (`claude -p`) as the backend, billed to the logged-in plan
+    rather than an api key. every call is a fresh process with no tools, no mcp,
+    no user settings/hooks, no CLAUDE.md and no auto-memory, run in an empty
+    directory. claude code still adds a short sdk identity line, an account
+    reminder and an environment block, so these runs are close to, but not
+    byte-identical with, api runs. thinking is not returned by the cli."""
+
+    def __init__(self, cfg: dict):
+        import shutil
+        import tempfile
+        self.cfg = cfg
+        self.bin = shutil.which(cfg.get("bin") or "claude")
+        if not self.bin:
+            sys.exit("config: claude-cli backend needs `claude` on PATH")
+        self.cwd = tempfile.mkdtemp(prefix="w")
+        self.env = {k: v for k, v in os.environ.items() if k != "ANTHROPIC_API_KEY"}  # keep plan billing
+        self.env.update(CLAUDE_CODE_DISABLE_AUTO_MEMORY="1", CLAUDE_CODE_DISABLE_CLAUDE_MDS="1")
+        self.sem = asyncio.Semaphore(int(cfg["max_concurrency"]))
+
+    async def act(self, turn: Turn) -> Reply:
+        if turn.images:
+            return Reply(error="claude-cli backend does not support pixels mode")
+        cmd = [self.bin, "-p", "--model", self.cfg["model"], "--system-prompt", turn.system,
+               "--tools", "", "--strict-mcp-config", "--setting-sources", "project",
+               "--no-session-persistence", "--output-format", "json", "--effort", self.cfg["effort"]]
+        last = None
+        async with self.sem:
+            for attempt in range(int(self.cfg["retries"]) + 1):
+                proc = None
+                try:
+                    proc = await asyncio.create_subprocess_exec(
+                        *cmd, cwd=self.cwd, env=self.env, stdin=asyncio.subprocess.PIPE,
+                        stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE)
+                    out, err = await asyncio.wait_for(proc.communicate(turn.prompt.encode("utf-8")),
+                                                      timeout=float(self.cfg["timeout"]))
+                except asyncio.TimeoutError:
+                    if proc:
+                        proc.kill()
+                    last = f"timeout after {self.cfg['timeout']}s"
+                    continue
+                try:
+                    d = json.loads(out)
+                except json.JSONDecodeError:
+                    last = f"rc={proc.returncode} non-json stdout {out[:200]!r} stderr {err[:300]!r}"
+                    await asyncio.sleep(min(30, 2 ** attempt))
+                    continue
+                usage = dict(d.get("usage") or {})
+                usage["model_usage"] = d.get("modelUsage")
+                usage["notional_cost_usd"] = d.get("total_cost_usd")   # list price; plan-billed
+                if d.get("is_error"):
+                    last = f"{d.get('subtype')}: {str(d.get('result'))[:300]}"
+                    if re.search(r"usage limit|rate limit|quota|limit reached", last, re.I):
+                        return Reply(error=f"claude-cli usage limit: {last}", usage=usage)
+                    await asyncio.sleep(min(30, 2 ** attempt))
+                    continue
+                return Reply(raw=d.get("result") or "", usage=usage, request_id=d.get("session_id"))
+        return Reply(error=f"claude-cli failed after retries: {last}")
+
+    async def close(self):
+        pass
+
+
 def make_agent(cfg: dict):
     if cfg["agent"] == "echo":
         return EchoAgent(cfg["echo"])
@@ -604,6 +679,8 @@ def make_agent(cfg: dict):
         return LLMAgent(cfg["llm"])
     if cfg["agent"] == "anthropic":
         return AnthropicAgent(cfg["anthropic"])
+    if cfg["agent"] == "claude-cli":
+        return ClaudeCLIAgent(cfg["claude_cli"])
     sys.exit(f"config: unknown agent kind {cfg['agent']!r}")
 
 
@@ -694,7 +771,7 @@ def new_run(cfg: dict, run_id: str | None) -> tuple[Path, dict]:
         "cols": cfg["cols"],
         "config": cfg,
         "prompts": {
-            "system": (ROOT / "prompts" / "system.txt").read_text(encoding="utf-8"),
+            "system": (ROOT / "prompts" / cfg.get("system_prompt", "system.txt")).read_text(encoding="utf-8"),
             "tick": (ROOT / "prompts" / "tick.txt").read_text(encoding="utf-8"),
         },
         "agents": build_world(cfg["rows"], cfg["cols"], rng),
@@ -762,6 +839,11 @@ def max_score(meta: dict) -> int:
 
 async def run(path: Path, meta: dict, states: list[AgentState], start: int, end: int):
     agent = make_agent(meta["config"])
+    cfg = meta["config"]
+    cap = cfg.get("cost_cap_usd")
+    pin, pout = cfg["llm"].get("price_in_per_m"), cfg["llm"].get("price_out_per_m")
+    spent, streak = 0.0, 0
+    resume_hint = f"resume with: python sim.py --resume {meta['run_id']} --ticks {end}"
     try:
         with open(path, "a", encoding="utf-8") as f:
             for t in range(start, end + 1):
@@ -777,6 +859,27 @@ async def run(path: Path, meta: dict, states: list[AgentState], start: int, end:
                     print(f"tick {t:4d}  {time.perf_counter() - t0:6.2f}s  agents with errors: {bad}{extra}", flush=True)
                 except (OSError, ValueError):
                     pass
+                errs = [e for a in rec["agents"] for e in a["errors"]]
+                lim = [e for e in errs if "usage limit" in e]
+                if lim:
+                    sys.exit(f"stopping after tick {t}: {lim[0][:300]}\n{resume_hint}")
+                streak = streak + 1 if bad == len(rec["agents"]) else 0
+                if streak >= 2:
+                    sys.exit(f"stopping after tick {t}: every agent errored two ticks running, "
+                             f"e.g. {errs[0][:300]}\n{resume_hint}")
+                if cap is not None and cfg["agent"] == "llm":
+                    for a in rec["agents"]:
+                        u = a.get("usage") or {}
+                        if u.get("cost") is not None:          # openrouter reports billed cost
+                            spent += float(u["cost"])
+                        elif pin is not None and pout is not None:
+                            spent += (u.get("prompt_tokens", 0) * pin + u.get("completion_tokens", 0) * pout) / 1e6
+                        else:
+                            sys.exit("cost_cap_usd is set but the provider reports no usage.cost "
+                                     "and llm.price_in_per_m / price_out_per_m are unset")
+                    if spent >= float(cap):
+                        sys.exit(f"stopping after tick {t}: spend ${spent:.2f} reached cost_cap_usd "
+                                 f"${float(cap):.2f}\n{resume_hint}")
     finally:
         await agent.close()
 
@@ -799,7 +902,7 @@ def main():
     ap.add_argument("--ticks", type=int, help="run until this tick number")
     ap.add_argument("--run-id", help="name for a new run")
     ap.add_argument("--resume", metavar="RUN", help="run id or path of a run to continue")
-    ap.add_argument("--agent", choices=["llm", "anthropic", "echo"], help="override agent kind for a new run")
+    ap.add_argument("--agent", choices=["llm", "anthropic", "claude-cli", "echo"], help="override agent kind for a new run")
     ap.add_argument("--world-seed", type=int, help="override world seed for a new run")
     ap.add_argument("--view", action="store_true", help="also open the viewer, following this run live")
     args = ap.parse_args()
