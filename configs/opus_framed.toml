@@ -1,0 +1,8 @@
+# claude-opus-5-5 framed (prereg deviation 8): neutral context line + high effort
+agent = "claude-cli"
+ticks = 50
+system_prompt = "system_framed.txt"
+[claude_cli]
+model = "claude-opus-5-5"
+effort = "high"
+max_concurrency = 9
