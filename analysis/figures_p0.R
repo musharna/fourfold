@@ -22,8 +22,10 @@ stopifnot(nrow(ro) > 0, !any(is.na(ro$arm)))
 # 1. eval vs floor -------------------------------------------------------------------------------
 ev <- bind_rows(ro |> filter(!is.na(eval_mean)) |> select(run, arm, model, void, eval_mean),
                 tidy_runs(tibble(run = "sol-50", void = FALSE, eval_mean = 0.597)))   # erin README / prereg
-fl <- ro |> group_by(arm) |> summarise(f0 = mean(f0_mean, na.rm = TRUE), .groups = "drop") |>
-  filter(is.finite(f0))
+# floor per arm; arms without their own tick-0 eval use the model's floor (prereg: F0 per model, seed 1001)
+fm <- ro |> group_by(model) |> summarise(f0m = mean(f0_mean, na.rm = TRUE), .groups = "drop")
+fl <- ro |> group_by(arm, model) |> summarise(f0 = mean(f0_mean, na.rm = TRUE), .groups = "drop") |>
+  left_join(fm, by = "model") |> mutate(f0 = ifelse(is.finite(f0), f0, f0m)) |> filter(is.finite(f0))
 p1 <- ggplot(ev, aes(arm, eval_mean)) +
   geom_errorbar(data = fl, aes(x = arm, ymin = f0, ymax = f0), inherit.aes = FALSE, width = 0.6,
                 colour = ff_muted, linewidth = 0.7) +
@@ -35,7 +37,7 @@ p1 <- ggplot(ev, aes(arm, eval_mean)) +
   scale_fill_manual(values = c(ff_model_cols, white = "white"), guide = "none") +
   scale_x_discrete(limits = arm_labels, drop = FALSE) +
   scale_y_continuous(limits = c(0, 0.65), breaks = seq(0, 0.6, 0.1)) +
-  labs(title = "Only erin's Sol run clears the bar",
+  labs(title = "Sol without the evaluation cue nearly matches erin's run; no other arm clears the bar",
        subtitle = "Eval score per run. Solid bar = zero-information floor, dashed = floor + 0.20. Hollow = void run.",
        x = NULL, y = "eval score (0-1)") +
   theme_fourfold()
