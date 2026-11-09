@@ -3,13 +3,13 @@ p0-opus-cued-1001	50	450	325	0.722	124	1	True	0.158	0.158	9	None	0	None	None
 p0-opus-framed-cued-1001	50	450	431	0.958	13	6	False	0.214	0.214	9	0.108	0	None	None
 p0-opus-framed-cued-1002	50	450	440	0.978	6	4	False	0.195	0.195	9	0.129	0	None	None
 p0-opus-framed-cued-1003	50	450	438	0.973	7	5	False	0.132	0.132	9	0.122	0	None	None
-p0-opus-framed-nocue-1001	21	189	142	0.751	38	9	True	None	None	0	None	5	9	None
+p0-opus-framed-nocue-1001	24	216	165	0.764	39	12	True	None	None	0	None	5	9	None
 p0-opus-nocue-1001	50	450	210	0.467	238	2	True	0.157	0.157	9	None	0	None	None
 p0-qwen-nothink-1001	50	450	441	0.98	0	9	False	0.086	0.086	9	0.089	0	None	None
 p0-qwen-nothink-1002	50	450	445	0.989	0	5	False	0.089	0.089	9	None	0	None	None
 p0-qwen-nothink-1003	50	450	448	0.996	0	2	False	0.089	0.089	9	None	0	None	None
-p0-solcx-cued-1001	17	153	144	0.941	0	9	True	None	None	0	None	0	None	None
-p0-solcx-nocue-1001	17	153	144	0.941	0	9	True	None	None	0	None	0	None	None
+p0-solcx-cued-1001	21	189	180	0.952	0	9	True	None	None	0	None	0	None	None
+p0-solcx-nocue-1001	22	198	189	0.955	0	9	True	None	None	0	None	0	None	None
 p0-sonnet-cued-1001	50	450	439	0.976	8	3	False	0.104	0.104	9	0.089	0	None	None
 p0-sonnet-cued-1002	50	450	435	0.967	14	1	False	0.119	0.119	9	None	0	None	None
 p0-sonnet-cued-1003	50	450	396	0.88	52	2	True	0.099	0.111	8	None	0	None	None
