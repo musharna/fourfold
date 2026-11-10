@@ -467,6 +467,57 @@ class EchoAgent:
         pass
 
 
+class ScriptedAgent:
+    """a cell that follows a fixed program instead of thinking (per-cell hook, e.g. a planted founder).
+    config: {"program": [{"from": t0, "to": t1, "out": [q0, q1, q2, q3]}, ...]}. at tick t the last rule
+    with from <= t <= to sets the outputs; with no rule the outputs are held. each out entry is "-" (hold)
+    or a hex template: {id} = the cell's 8-hex seed, {t} = tick as 8 hex, {j} = port index as 8 hex,
+    {jd} = port index in decimal, <...> = the printable ascii inside, hex-encoded (after substitution).
+    the result is right-padded with zeros to the port width; anything longer or non-hex fails loud.
+    it answers in the llm text format, so the parser and error paths run as for any agent."""
+
+    def __init__(self, cfg: dict):
+        self.program = list(cfg.get("program") or [])
+        if not self.program:
+            sys.exit("config: scripted cell has an empty program")
+        for r in self.program:
+            if set(r) - {"from", "to", "out"} or "from" not in r or len(r.get("out", [])) != 4:
+                sys.exit(f"config: scripted rule needs from, optional to, and 4 outs: {r}")
+            for j, tpl in enumerate(r["out"]):
+                if tpl != "-":
+                    self.render(tpl, "0" * 8, int(r["from"]), j)   # fail at start, not mid-run
+
+    @staticmethod
+    def render(tpl: str, seed: str, t: int, j: int) -> str:
+        v = fill(tpl, {"id": seed, "t": f"{t:08x}", "j": f"{j:08x}", "jd": j})
+        def asc(m):
+            s = m.group(1)
+            if not all(32 <= ord(c) < 127 for c in s):
+                sys.exit(f"config: scripted text must be printable ascii: {s!r}")
+            return s.encode("ascii").hex()
+        v = re.sub(r"<([^<>]*)>", asc, v).lower()
+        if not re.fullmatch(r"[0-9a-f]*", v) or len(v) > HEXN:
+            sys.exit(f"config: scripted template {tpl!r} renders to {v!r}: not hex or longer than {HEXN}")
+        return v.ljust(HEXN, "0")
+
+    async def act(self, turn: Turn) -> Reply:
+        st, t = turn.state, turn.t
+        outs, rule = list(st.outputs), None
+        for r in self.program:
+            if int(r["from"]) <= t <= int(r.get("to", r["from"] if "to" in r else 10**9)):
+                rule = r
+        if rule:
+            outs = [o if tpl == "-" else self.render(tpl, st.seed, t, j)
+                    for j, (o, tpl) in enumerate(zip(outs, rule["out"]))]
+        raw = f"<log>\nscripted: {'rule from t' + str(rule['from']) if rule else 'holding'}\n</log>\n"
+        if not st.protocol:
+            raw += "<protocol>scripted cell</protocol>\n"
+        return Reply(raw=raw + "".join(f"<q{i}>{v}</q{i}>\n" for i, v in enumerate(outs)))
+
+    async def close(self):
+        pass
+
+
 class LLMAgent:
     """one stateless chat completion per agent per tick. memory lives only in
     the protocol and the log tail that the tick prompt shows back."""
@@ -771,7 +822,57 @@ def make_agent(cfg: dict):
         return ClaudeCLIAgent(cfg["claude_cli"])
     if cfg["agent"] == "codex-cli":
         return CodexCLIAgent(cfg["codex_cli"])
+    if cfg["agent"] == "scripted":
+        return ScriptedAgent(cfg.get("scripted") or {})
     sys.exit(f"config: unknown agent kind {cfg['agent']!r}")
+
+
+def cell_overrides(cfg: dict) -> dict:
+    """cfg["cells"]: {cell index: config overrides for that cell}, e.g.
+    {"6": {"agent": "scripted", "scripted": {"program": [...]}}}. absent = every cell runs cfg["agent"]."""
+    n = cfg["rows"] * cfg["cols"]
+    over = {int(k): v for k, v in (cfg.get("cells") or {}).items()}
+    bad = [k for k in over if not 0 <= k < n]
+    if bad:
+        sys.exit(f"config: cells {bad} outside the {n}-cell grid")
+    return over
+
+
+def cell_kind(cfg: dict, i: int) -> str:
+    return cell_overrides(cfg).get(i, {}).get("agent", cfg["agent"])
+
+
+def make_agents(cfg: dict) -> list:
+    """one agent object per cell: the run's agent, except cells overridden in cfg["cells"]."""
+    over = cell_overrides(cfg)
+    base = make_agent(cfg)
+    return [make_agent(deep_merge(cfg, over[i])) if i in over else base for i in range(cfg["rows"] * cfg["cols"])]
+
+
+PERTURB_ACTIONS = ("silence", "wipe")
+
+
+def check_perturb(cfg: dict):
+    n = cfg["rows"] * cfg["cols"]
+    for p in cfg.get("perturb") or []:
+        if p.get("action") not in PERTURB_ACTIONS or not 0 <= int(p.get("cell", -1)) < n or "from" not in p:
+            sys.exit(f"config: perturbation needs action in {PERTURB_ACTIONS}, a cell 0..{n - 1} and from: {p}")
+
+
+def perturbations(cfg: dict, t: int) -> dict:
+    """active perturbations at tick t, {cell: {action}}. cfg["perturb"] is a list of {cell, action, from, to}:
+    "silence" = the cell is not asked and its ports read zero for ticks from..to (to defaults to from);
+    "wipe" = its protocol, log and notices are erased at tick from, before it acts."""
+    out: dict = {}
+    for p in cfg.get("perturb") or []:
+        f = int(p["from"])
+        if (p["action"] == "wipe" and t == f) or (p["action"] == "silence" and f <= t <= int(p.get("to", f))):
+            out.setdefault(int(p["cell"]), set()).add(p["action"])
+    return out
+
+
+async def _silent() -> Reply:
+    return Reply()
 
 
 async def safe_act(agent, turn: Turn) -> Reply:
@@ -791,7 +892,10 @@ async def step(t: int, meta: dict, states: list[AgentState], agent) -> dict:
     world = meta["agents"]
     inputs = read_inputs(world, states)          # everyone reads first
     turns, scores = [], []
+    acts = perturbations(cfg, t)
     for st, inp in zip(states, inputs):
+        if "wipe" in acts.get(st.id, ()):            # perturbation: the cell forgets its notebook
+            st.protocol, st.log, st.notices = "", [], []
         changed = [x != y for x, y in zip(inp, st.prev_inputs)]
         st.history.append(inp)
         del st.history[:-HISTORY]
@@ -804,14 +908,18 @@ async def step(t: int, meta: dict, states: list[AgentState], agent) -> dict:
             images=port_pictures(inp, st.outputs, int(cfg.get("pixel_scale", 16)))[1] if PIXEL else [],
         ))
 
-    replies = await asyncio.gather(*(safe_act(agent, tn) for tn in turns))
+    pick = (lambda i: agent[i]) if isinstance(agent, list) else (lambda i: agent)
+    replies = await asyncio.gather(*(_silent() if "silence" in acts.get(tn.state.id, ()) else safe_act(pick(tn.state.id), tn)
+                                     for tn in turns))
 
     records = []
     for tn, rep, score in zip(turns, replies, scores):          # then everyone writes
         st = tn.state
         errors = [rep.error] if rep.error else []
         refused = rep.error and rep.error.startswith("refusal")
-        if (rep.error and not rep.raw) or refused:   # never act on a refused reply
+        if "silence" in acts.get(st.id, ()):         # perturbation: dead this tick, its ports read zero
+            outs, lines, proto, notices = [ZERO] * 4, [], st.protocol, []
+        elif (rep.error and not rep.raw) or refused:   # never act on a refused reply
             outs, lines, proto = list(st.outputs), [], st.protocol
             notices = [NO_REPLY_NOTICE]
         else:
@@ -834,6 +942,8 @@ async def step(t: int, meta: dict, states: list[AgentState], agent) -> dict:
             "usage": rep.usage,
             "request_id": rep.request_id,
         }
+        if acts.get(st.id):
+            rec["perturbed"] = sorted(acts[st.id])
         if score is not None:
             rec["score"] = score         # naming task: earned on this tick's inputs, before writing
         if cfg.get("store_prompts"):
@@ -928,8 +1038,9 @@ def max_score(meta: dict) -> int:
 
 
 async def run(path: Path, meta: dict, states: list[AgentState], start: int, end: int):
-    agent = make_agent(meta["config"])
     cfg = meta["config"]
+    check_perturb(cfg)
+    agent = make_agents(cfg)
     cap = cfg.get("cost_cap_usd")
     pin, pout = cfg["llm"].get("price_in_per_m"), cfg["llm"].get("price_out_per_m")
     spent, streak = 0.0, 0
@@ -973,7 +1084,8 @@ async def run(path: Path, meta: dict, states: list[AgentState], start: int, end:
                         sys.exit(f"stopping after tick {t}: spend ${spent:.2f} reached cost_cap_usd "
                                  f"${float(cap):.2f}\n{resume_hint}")
     finally:
-        await agent.close()
+        for a in {id(x): x for x in agent}.values():
+            await a.close()
 
 
 def open_viewer(path: Path):

@@ -220,11 +220,14 @@ async def ask_all(meta: dict, ticks: list[dict], eval_tpl: str) -> tuple[int, li
         turns.append(sim.Turn(t=t + 1, state=st, inputs=inp, changed=[False] * 4,
                               system=sim.system_prompt(meta, st.seed),
                               prompt=sim.fill(eval_tpl, vals), images=images))
-    agent = sim.make_agent(meta["config"])
+    cfg = meta["config"]
+    agents = sim.make_agents(cfg)
+    turns = [tn for tn in turns if sim.cell_kind(cfg, tn.state.id) != "scripted"]   # scripted cells aren't quizzed
     try:
-        replies = await asyncio.gather(*(sim.safe_act(agent, tn) for tn in turns))
+        replies = await asyncio.gather(*(sim.safe_act(agents[tn.state.id], tn) for tn in turns))
     finally:
-        await agent.close()
+        for a in {id(x): x for x in agents}.values():
+            await a.close()
     return t, list(zip(turns, replies))
 
 
