@@ -82,3 +82,16 @@ a live suspect and this run cannot test it.
 **Stage 2 deviation, logged late:** API-1001 ticks 21-30 ran with 1-5 agents failing on HTTP 402; they were cut and
 the run resumed from t20 (backup kept). The discarded ticks held no text (checked 11-10). Paired counts so far:
 2/2 API vs 0/2 codex is Fisher p = 0.33; the t30 rule above was met on seed 1001 (first text t41).
+
+## Stage 4 (frozen 2026-11-10 03:24, before the first call): does less reasoning suppress text on the API route?
+Run `configs/sol_api_rmed.toml` (= `sol_api.toml` with reasoning effort "medium"; nothing else changed), world seed
+1002, 30 ticks, run id `p0-solapi-rmed-1002`. Pairs: `p0-solapi-cued-1002` (effort high: first text t12, 6/9 cells
+by t17) and `p0-solcx-cued-1002` (codex: 0/9).
+Calibration: after tick 3 the median reasoning tokens per call must be <= 325 (codex cued-1002 t1-3: 271; API
+high t1-3: 340). If above, stop, keep the file as a discarded pilot, and rerun as `p0-solapi-rlow-1002` with effort
+"low"; no further levels, whatever "low" gives is reported.
+Readouts: reasoning tokens (t1-3, t1-30), log words/tick, text cells and first text tick (is_text L=10), composing
+cells (`founder_readout`, all 9 cells).
+Reading (descriptive, n = 1): no text by t30 with reasoning at codex level → consistent with the reasoning budget
+being the dial (not proof: one seed, and bare 1001 took 41 ticks). Text by t30 → less reasoning alone does not
+suppress text; suspicion moves to the scaffold or the serving path. Cost: within the $5.50 cap.
