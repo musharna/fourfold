@@ -16,7 +16,7 @@ for seed in "$@"; do
     t=$(date -d "$when" +%s) || { echo "cannot parse reset time: '$last'"; exit 5; }
     s=$(( t - $(date +%s) + 300 )); (( s < 300 )) && s=300
     echo "[$(date -Is)] ${rid} hit usage limit; sleeping ${s}s until $(date -d @$((t+300)))"
-    sleep "$s"
+    wake=$(( $(date +%s) + s )); until (( $(date +%s) >= wake )); do sleep 60; done   # wall clock: a plain sleep stalls while the laptop is suspended
   done
 done
 echo "[$(date -Is)] ${arm} seeds $* done"
