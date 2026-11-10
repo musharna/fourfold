@@ -51,3 +51,14 @@ If no API credit: only C arms run; H-verb is then codex-side only, H-scaf and H-
 **Stage 2 (decided after, not frozen here):** a full 50-tick run with the identified fix.
 **Cost:** codex 120 calls (~0.3 Plus window); API 240 calls, ~$7 at $2/$10 per M (live 11-09).
 **Dropped:** effort arm (erin and ours both "high"; the output-token gap is read off the verbosity arms).
+
+## Stage 2 (frozen 2026-11-10, before the first call): trajectory-level route test
+Single-call replay found no route difference, but erin's README reports text in both of her 128-bit Sol runs
+(sol-50; byte_ban run, high-bit ASCII from t21) against 0 of our 5 codex runs. Full runs on erin's route
+(`configs/sol_api.toml`: bare chat completions, effort high, no verbosity, no scaffold, OpenRouter pinned to OpenAI),
+world seed 1001 first (paired with p0-solcx-cued-1001), then 1002 if funded. Cost cap $5.50 per funding step;
+a capped run resumes to t50 when credit is added.
+Readouts: cells with text output (is_text L=10), first text tick, cells composing their own text
+(`founder_readout.readout`, no founder), eval vs the paired codex run.
+Reading (descriptive, n <= 2): text in an API run when the paired codex run had none favors a trajectory-level
+route effect. No text in API runs by t30 favors the "rare founder" reading.

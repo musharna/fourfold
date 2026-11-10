@@ -1,0 +1,17 @@
+# erin's route for gpt-6.1-sol: bare chat completions (system + user), reasoning effort high, no verbosity,
+# no codex scaffolding — via OpenRouter pinned to the OpenAI provider (T_text follow-up: trajectory-level route test).
+# compare with configs/sol_codex.toml runs of the same world seed.
+agent = "llm"
+ticks = 50
+cost_cap_usd = 5.5
+[llm]
+base_url = "https://openrouter.ai/api/v1"
+model = "openai/gpt-6.1-sol"
+api_key_env = "OPENROUTER_API_KEY"
+temperature = ""
+max_tokens = 16000
+max_tokens_param = "max_completion_tokens"
+timeout = 300
+retries = 3
+max_concurrency = 9
+extra_body = {reasoning = {effort = "high"}, provider = {order = ["openai"], allow_fallbacks = false}, usage = {include = true}}
