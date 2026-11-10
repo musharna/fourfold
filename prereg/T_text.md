@@ -71,3 +71,14 @@ Readouts: log words/tick (t1-5, t1-40), distinct outputs t1-40, text cells and f
 Reading (descriptive, n = 1): logs and distinct outputs move to the API values AND text appears → verbosity is the dial.
 Logs move but no text → verbosity explains the style gap but not the text (scaffolding or chance).
 Logs don't move → verbosity isn't what shortens them.
+
+**Stage 3 addendum (2026-11-10 03:25, before the first call; from the session audit):** two readouts added.
+(1) Median reasoning tokens per call (t1-11 and t1-50). Codex calls reason about half as much as API calls at the
+same nominal effort "high" (full runs, cued: 223-242 vs 421-458; erin 512; same request body replayed: codex
+394-446 vs API+scaffold 788-801), and single-call verbosity=medium did not raise it (394 vs 446). So a third
+reading is possible: logs lengthen, reasoning stays low, no text → the serving path's reasoning budget is still
+a live suspect and this run cannot test it.
+(2) Error-free fraction is reported with and without all-agent usage-limit ticks (a freeze tick changes no state).
+**Stage 2 deviation, logged late:** API-1001 ticks 21-30 ran with 1-5 agents failing on HTTP 402; they were cut and
+the run resumed from t20 (backup kept). The discarded ticks held no text (checked 11-10). Paired counts so far:
+2/2 API vs 0/2 codex is Fisher p = 0.33; the t30 rule above was met on seed 1001 (first text t41).
