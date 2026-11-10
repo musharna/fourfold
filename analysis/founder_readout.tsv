@@ -1,0 +1,2 @@
+run	ticks	R1_relay	R2_adopt	R3_late_cells	first_composed_t	n_cells	eval_founder	eval_paired_nofounder
+p0-solcx-founder-1001	50	7	6	5	14	8	0.558	0.287
