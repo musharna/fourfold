@@ -34,7 +34,14 @@ Figures: `figures/p0_eval.png`, `figures/p0_refusals.png`, `figures/p0_neighbors
 All six codex Sol runs are valid: 93.3–97.3% error-free. Their only errors are usage-limit ticks where every
 call failed and no state changed (1–3 per run); without those ticks, 99.3–100%.
 
+Zero-information floors (quiz at tick 0): cued 0.089 on seeds 1001, 1002 and 1003; no-cue 0.046 (1002), 0.081 (1003).
+
+## Follow-up (P1_founder, seed 1001 of 3; `analysis/founder_readout.tsv`)
+One scripted cell sent erin's "ECHO Qj NOW!" at t6–12. 6 of the 8 Sol cells then composed their own English (first
+t14; 5 still at t30–50), and the 8 cells scored 0.558 vs 0.287 for the same cells in the run without a founder
+(count 0.83 vs 0.50, arrangement 0.50 vs 0.00, position 0.50 vs 0.12, map 0.10 vs 0.00; far IDs named 25 vs 8).
+One seed. Against a simple "English raises the score": codex seed 1003 found English unaided at t24 and scored 0.298.
+
 ## Not yet done
-Zero-information floors for the two 1003 runs (queued; the prereg floor is seed 1001); a third bare-API seed (1003,
-needs ~$8 OpenRouter credit); framed-Sol check; redact the account email in
+Founder seeds 1002/1003 (running); a third bare-API seed (1003, needs ~$8 OpenRouter credit); framed-Sol check; redact the account email in
 `runs/p0-opus-framed-nocue-1001/ticks.jsonl` before anything is published.
