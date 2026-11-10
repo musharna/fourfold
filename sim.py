@@ -704,7 +704,8 @@ class CodexCLIAgent:
             cmd = [self.jail, work, "exec", "--ephemeral", "--skip-git-repo-check",
                    "-s", "danger-full-access", "-C", "/work", "-m", self.cfg["model"],
                    "-c", "model_instructions_file=/work/sys.txt",
-                   "-c", f"model_reasoning_effort={self.cfg['effort']}", "--json", turn.prompt]
+                   "-c", f"model_reasoning_effort={self.cfg['effort']}",
+                   *self.cfg.get("extra_args", []), "--json", turn.prompt]
             proc = await asyncio.create_subprocess_exec(
                 *cmd, stdin=asyncio.subprocess.DEVNULL, stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE)

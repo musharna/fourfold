@@ -1,0 +1,53 @@
+# T_text: why do our Sol cells never write ASCII text? (frozen 2026-11-09, before any call)
+
+**Observation.** erin's sol-50: agent 7 at t6 sends `ID + "ECHO Qj NOW!"`, copied by 9/9 by t14.
+Our 5 Sol runs (codex route): same `[ID|tick|idx|payload]` hex framing, ASCII only as 4-byte tags, 0/9 text.
+Rendered system prompt word-identical (line wrap only); same model and effort; 0 shell commands in any run.
+
+**Measured differences of our route** (`analysis/codex_capture/default.json`, captured via a local mock
+provider, same flags as the runs): `text.verbosity = "low"`; our system prompt sent as a *developer*
+message; ~9.5k tokens extra (exec/wait/request_user_input tools 20k chars, collaboration tools 5.5k,
+skills list 6k, multi-agent role 2.7k, environment context); Responses API on the ChatGPT backend.
+Flags can set verbosity=medium and cut only ~20% of the rest (`stripped.json`).
+
+## Hypotheses
+- **H-verb** low verbosity suppresses the prose idea.
+- **H-scaf** codex's coding-agent scaffolding suppresses it.
+- **H-serve** ChatGPT-backend serving differs from the API (snapshot/defaults).
+- **H-chance** nothing suppresses it: invention is a rare, history-dependent founder event.
+- **H-copy** our route also fails to *copy* text when a neighbor sends it.
+
+## Design: replay single agent-ticks, N = 20 calls per arm x state
+States (stored prompts replayed byte-for-byte; erin's states use her stored system template + seed):
+- **S1 founder**: sol-50 agent index 6, t6 (the tick it invented ECHO).
+- **S2 contagion**: sol-50 agent index 3, t7 (input p2 carries "ECHO Q0 NOW!").
+- **S3 ours**: p0-solcx-cued-1002 agent index 6, t6.
+
+Arms (all gpt-6.1-sol, reasoning effort high):
+| arm | route | request |
+|---|---|---|
+| C-low | codex (Plus) | exactly as in the runs |
+| C-med | codex (Plus) | + `model_verbosity=medium` |
+| A-bare | OpenRouter | erin's request: system + user, no verbosity (default medium) |
+| A-bare-low | OpenRouter | A-bare + verbosity low |
+| A-scaf-low | OpenRouter | codex replica: developer msgs + codex blocks + tools from default.json, verbosity low (approximation: chat completions, so tool namespaces and the freeform `exec` grammar are flattened to plain functions, grammar text kept in the description) |
+| A-scaf-med | OpenRouter | A-scaf-low with verbosity medium |
+
+**Readout (per call):** text = any of q0–q3 passes `emergence.is_text(L=10)` after `sim.parse_response`.
+Secondary: output tokens; S2 exact copy of the incoming ECHO value.
+**Scorer control (must pass before any call):** erin's stored replies at S1 and S2 score text=True;
+our stored reply at S3 scores False. The replay tool exits if not.
+
+## Decision rules (Fisher exact two-sided, p < 0.05, N = 20 vs 20)
+- H-verb supported: C-med > C-low at S1, and A-bare > A-bare-low at S1.
+- H-scaf supported: A-bare-low > A-scaf-low at S1 (or A-bare > A-scaf-med).
+- H-serve supported: A-scaf-low > C-low at S1.
+- H-copy supported: C-low < A-bare at S2.
+- H-chance supported: C-low at S1 >= 5/20 and none of H-verb/H-scaf/H-serve supported; corroborated if
+  A-bare at S3 <= 2/20 (our histories are not "ripe" on any route).
+Causes can combine; every comparison is reported with counts. A result that needs a threshold moved is a fail.
+If no API credit: only C arms run; H-verb is then codex-side only, H-scaf and H-serve stay OPEN.
+
+**Stage 2 (decided after, not frozen here):** a full 50-tick run with the identified fix.
+**Cost:** codex 120 calls (~0.3 Plus window); API 240 calls, ~$7 at $2/$10 per M (live 11-09).
+**Dropped:** effort arm (erin and ours both "high"; the output-token gap is read off the verbosity arms).
