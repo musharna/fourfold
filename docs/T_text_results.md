@@ -30,10 +30,13 @@ The real rate is far lower than that assumption, so the rule can't pass. I'm not
   (codex alone 5/40, p ≈ 0.06). Codex's coding-agent scaffolding may halve how often a cell composes its own
   English, while not affecting relay. This is a candidate for its own preregistered test.
 
-**Answer to "what causes it":** no setup difference explains the missing text. It needs a founder
-event that is rare in any setup (~1% per call even at erin's best moment), after which text spreads by relay.
-Our 5 runs without one fit that. The likely secondary factor (exploratory): scaffolding lowers own-English
-composition, which could slow or thin out the spread.
+**Answer to "what causes it" (revised 11-10 after re-reading erin's README):** no difference was detectable
+*at a single call*. Invention is ~1% per call even at erin's best moment, and relay is universal. But erin's README
+also reports text in her `byte_ban` Sol run (high-bit ASCII from t21, spreading like plain ASCII). So her setup made
+text in both 128-bit Sol runs she describes, versus 0 of our 5. That fits "lucky draw" poorly, and it leaves a
+**trajectory-level** route effect open: a small per-call difference (e.g. the exploratory scaffolding effect on
+composition) that compounds over 50 ticks. A single-call replay cannot see that. The test that decides it is full
+runs on erin's route (bare API), compared with our codex runs.
 
 **Next:** plant a scripted founder in full Sol runs (`prereg/P1_founder.md`) to test whether a founder
 alone makes our cells adopt and keep English.
