@@ -31,3 +31,19 @@ excluded) gives R2 ≥ 7/8 (agents composed "WHO SEES?", "SAW Q3", ...); the ech
 (echo cells only relay) gives R1 > 0 and R2 = 0.
 
 **Cost:** ~410 Sol calls per run (~170 Codex credits); queued after Sol 1003 finishes.
+
+## Addendum: sham-founder control (frozen 2026-11-10 18:00, before any sham call; founder seed 1001 already read)
+**Seen first:** founder-1001 gave R2 6/8, R3 5 cells, eval 0.558 vs 0.287 paired. Post hoc (`analysis/relay_vs_score.py`):
+across our 9 Sol runs the score tracks relaying in port traffic (non-neighbor IDs heard per cell: cued 0.1–1.0 →
+0.28–0.31; founder 3.4 → 0.56; no-cue 3.1–5.3 → 0.57–0.88; run-level rho 0.71), not English (9/9 composing in
+cued-1003 scored 0.30; no-cue runs have no English).
+**Question.** Is the founder effect due to the English message, or to swapping a Sol cell for a scripted one whose
+regular frames carry its ID and port number?
+**Design.** Arm `solcx-sham` (`configs/sol_codex_sham.toml`): the founder arm with cell 6 sending hex frames on
+every tick (dry run: identical to the founder cell outside t6–12, no text). World seed 1001 only (Codex budget),
+run id `p0-solcx-sham-1001`; compared with founder-1001 and cued-1001 over the same 8 cells. Replaces T_text stage 3
+in the queue (`scripts/codex_queue4.sh`).
+**Readouts.** Eval mean over the 8 Sol cells; non-neighbor IDs heard per cell; R1/R2 as above.
+**Reading (n = 1, descriptive).** Sham eval ≤ 0.35 and far IDs heard ≤ 1.5 per cell → the scripted cell alone does
+not produce the effect. Sham eval ≥ 0.45 → the effect is at least partly the scripted cell, not the English.
+In between: no verdict. VOID rule as in P0.

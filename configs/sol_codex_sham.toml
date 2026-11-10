@@ -1,0 +1,15 @@
+# P1_founder sham control (prereg/P1_founder.md, addendum 2026-11-10): the founder arm with the English removed.
+# Cell 6 is the same scripted cell and sends its hex frames on every tick, including t6-12.
+agent = "codex-cli"
+ticks = 50
+[codex_cli]
+model = "gpt-6.1-sol"
+effort = "high"
+max_concurrency = 9
+
+[cells.6]
+agent = "scripted"
+[cells.6.scripted]
+program = [
+  {from = 1, out = ["{id}{t}{j}", "{id}{t}{j}", "{id}{t}{j}", "{id}{t}{j}"]},
+]
