@@ -9,7 +9,11 @@ p0-qwen-nothink-1001	50	450	441	0.98	0	9	False	0.086	0.086	9	0.089	0	None	None
 p0-qwen-nothink-1002	50	450	445	0.989	0	5	False	0.089	0.089	9	None	0	None	None
 p0-qwen-nothink-1003	50	450	448	0.996	0	2	False	0.089	0.089	9	None	0	None	None
 p0-solcx-cued-1001	50	450	438	0.973	0	12	False	0.288	0.288	9	0.089	0	None	None
+p0-solcx-cued-1002	50	450	432	0.96	0	18	False	0.308	0.308	9	None	0	None	None
+p0-solcx-cued-1003	5	45	44	0.978	0	1	True	None	None	0	None	0	None	None
 p0-solcx-nocue-1001	50	450	433	0.962	0	17	False	0.57	0.57	9	None	0	None	None
+p0-solcx-nocue-1002	50	450	420	0.933	0	30	False	0.594	0.594	9	None	0	None	None
+p0-solcx-nocue-1003	15	135	117	0.867	0	18	True	None	None	0	None	0	None	None
 p0-sonnet-cued-1001	50	450	439	0.976	8	3	False	0.104	0.104	9	0.089	0	None	None
 p0-sonnet-cued-1002	50	450	435	0.967	14	1	False	0.119	0.119	9	None	0	None	None
 p0-sonnet-cued-1003	50	450	396	0.88	52	2	True	0.099	0.111	8	None	0	None	None
