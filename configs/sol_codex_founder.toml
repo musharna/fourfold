@@ -1,0 +1,17 @@
+# P1_founder (prereg/P1_founder.md): P0 Sol cued arm with cell 6 replaced by a scripted founder that
+# sends erin's founder message "ECHO Qj NOW!" on every port at t6-12, hex frames otherwise
+agent = "codex-cli"
+ticks = 50
+[codex_cli]
+model = "gpt-6.1-sol"
+effort = "high"
+max_concurrency = 9
+
+[cells.6]
+agent = "scripted"
+[cells.6.scripted]
+program = [
+  {from = 1, to = 5, out = ["{id}{t}{j}", "{id}{t}{j}", "{id}{t}{j}", "{id}{t}{j}"]},
+  {from = 6, to = 12, out = ["{id}<ECHO Q{jd} NOW!>", "{id}<ECHO Q{jd} NOW!>", "{id}<ECHO Q{jd} NOW!>", "{id}<ECHO Q{jd} NOW!>"]},
+  {from = 13, out = ["{id}{t}{j}", "{id}{t}{j}", "{id}{t}{j}", "{id}{t}{j}"]},
+]

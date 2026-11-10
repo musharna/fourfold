@@ -1,0 +1,152 @@
+[2026-11-10T01:26:49-05:00] replay attempt 1 arms=C-low,C-med
+control PASS: S1/S2 stored replies score text, S3 does not; prev outputs non-text; S2 inputs text; fisher ok
+120 calls to make (240 done)
+C-low       S1 # 5 text=False 
+C-low       S1 # 0 text=False 
+C-low       S1 # 6 text=False 
+C-low       S1 # 1 text=False 
+C-low       S1 # 7 text=False 
+C-low       S1 # 2 text=False 
+C-low       S1 # 8 text=False 
+C-low       S1 # 4 text=False 
+C-low       S1 # 3 text=False 
+C-low       S1 #10 text=False 
+C-low       S1 # 9 text=False 
+C-low       S1 #11 text=False 
+C-low       S1 #15 text=False 
+C-low       S1 #12 text=False 
+C-low       S1 #14 text=False 
+C-low       S1 #16 text=False 
+C-low       S1 #17 text=False 
+C-low       S1 #13 text=False 
+C-low       S1 #18 text=False 
+C-low       S2 # 3 text=True 
+C-low       S1 #19 text=False 
+C-low       S2 # 2 text=True 
+C-low       S2 # 1 text=True 
+C-low       S2 # 0 text=True 
+C-low       S2 # 4 text=True 
+C-low       S2 # 6 text=True 
+C-low       S2 # 5 text=True 
+C-low       S2 # 7 text=True 
+C-low       S2 #12 text=True 
+C-low       S2 # 8 text=True 
+C-low       S2 # 9 text=True 
+C-low       S2 #10 text=True 
+C-low       S2 #11 text=True 
+C-low       S2 #13 text=True 
+C-low       S2 #14 text=True 
+C-low       S2 #15 text=True 
+C-low       S2 #16 text=True 
+C-low       S2 #18 text=True 
+C-low       S2 #17 text=True 
+C-low       S2 #19 text=True 
+C-low       S3 # 2 text=False 
+C-low       S3 # 1 text=False 
+C-low       S3 # 3 text=False 
+C-low       S3 # 0 text=False 
+C-low       S3 # 5 text=False 
+C-low       S3 # 4 text=False 
+C-low       S3 # 6 text=False 
+C-low       S3 # 7 text=False 
+C-low       S3 # 9 text=False 
+C-low       S3 # 8 text=False 
+C-low       S3 #11 text=False 
+C-low       S3 #10 text=False 
+C-low       S3 #12 text=False 
+C-low       S3 #13 text=False 
+C-low       S3 #16 text=False 
+C-low       S3 #15 text=False 
+C-low       S3 #14 text=False 
+C-low       S3 #19 text=False 
+C-low       S3 #17 text=False 
+C-low       S3 #18 text=False 
+C-med       S1 # 2 text=False 
+C-med       S1 # 1 text=False 
+C-med       S1 # 6 text=False 
+C-med       S1 # 0 text=False 
+C-med       S1 # 5 text=False 
+C-med       S1 # 7 text=False 
+C-med       S1 # 8 text=False 
+C-med       S1 # 4 text=False 
+C-med       S1 # 3 text=False 
+C-med       S1 #10 text=False 
+C-med       S1 # 9 text=False 
+C-med       S1 #13 text=False 
+C-med       S1 #15 text=False 
+C-med       S1 #11 text=False 
+C-med       S1 #16 text=False 
+C-med       S1 #17 text=False 
+C-med       S1 #12 text=False 
+C-med       S1 #14 text=False 
+C-med       S1 #18 text=False 
+C-med       S1 #19 text=False 
+C-med       S2 # 1 text=True 
+C-med       S2 # 2 text=True 
+C-med       S2 # 3 text=True 
+C-med       S2 # 0 text=True 
+C-med       S2 # 5 text=True 
+C-med       S2 # 4 text=True 
+C-med       S2 # 6 text=True 
+C-med       S2 # 7 text=True 
+C-med       S2 # 8 text=True 
+C-med       S2 #10 text=True 
+C-med       S2 # 9 text=True 
+C-med       S2 #11 text=True 
+C-med       S2 #12 text=True 
+C-med       S2 #14 text=True 
+C-med       S2 #13 text=True 
+C-med       S2 #15 text=True 
+C-med       S2 #16 text=True 
+C-med       S2 #17 text=True 
+C-med       S3 # 0 text=False 
+C-med       S2 #19 text=True 
+C-med       S2 #18 text=True 
+C-med       S3 # 2 text=False 
+C-med       S3 # 1 text=False 
+C-med       S3 # 3 text=False 
+C-med       S3 # 4 text=False 
+C-med       S3 # 6 text=False 
+C-med       S3 # 7 text=False 
+C-med       S3 # 5 text=False 
+C-med       S3 # 8 text=False 
+C-med       S3 # 9 text=False 
+C-med       S3 #11 text=False 
+C-med       S3 #10 text=False 
+C-med       S3 #12 text=False 
+C-med       S3 #14 text=False 
+C-med       S3 #13 text=False 
+C-med       S3 #15 text=False 
+C-med       S3 #17 text=False 
+C-med       S3 #16 text=False 
+C-med       S3 #19 text=False 
+C-med       S3 #18 text=False 
+arm	state	text	valid	median_out_tokens
+C-low	S1	0	20	1355
+C-low	S2	20	20	1232
+C-low	S3	0	20	1187
+C-med	S1	0	20	1340
+C-med	S2	20	20	1215
+C-med	S3	0	20	1198
+A-bare	S1	1	20	1716
+A-bare	S2	20	20	1437
+A-bare	S3	0	20	1300
+A-bare-low	S1	0	20	1654
+A-bare-low	S2	20	20	1422
+A-bare-low	S3	0	20	1293
+A-scaf-low	S1	0	20	1799
+A-scaf-low	S2	20	20	1530
+A-scaf-low	S3	0	20	1548
+A-scaf-med	S1	0	20	1799
+A-scaf-med	S2	20	20	1431
+A-scaf-med	S3	0	20	1605
+
+H-verb codex   C-med 0/20 vs C-low 0/20 @S1  p=1  not supported
+H-verb api     A-bare 1/20 vs A-bare-low 0/20 @S1  p=1  not supported
+H-scaf (low)   A-bare-low 0/20 vs A-scaf-low 0/20 @S1  p=1  not supported
+H-scaf (med)   A-bare 1/20 vs A-scaf-med 0/20 @S1  p=1  not supported
+H-serve        A-scaf-low 0/20 vs C-low 0/20 @S1  p=1  not supported
+H-copy         A-bare 20/20 vs C-low 20/20 @S2  p=1  not supported
+H-chance       C-low @S1 0/20 (>=5 needed), no route cause supported=True  not supported; A-bare @S3 0/20
+[2026-11-10T01:38:48-05:00] p0-solcx-cued-1002 F0:  mean                       0.00 0.00      0.00   0.33   0.09   (true count 9; map = score right/wrong)
+[2026-11-10T01:39:39-05:00] p0-solcx-nocue-1002 F0:  mean                       0.00 0.00      0.00   0.17   0.05   (true count 9; map = score right/wrong)

@@ -1,4 +1,10 @@
 arm	state	text	valid	median_out_tokens
+C-low	S1	0	20	1355
+C-low	S2	20	20	1232
+C-low	S3	0	20	1187
+C-med	S1	0	20	1340
+C-med	S2	20	20	1215
+C-med	S3	0	20	1198
 A-bare	S1	1	20	1716
 A-bare	S2	20	20	1437
 A-bare	S3	0	20	1300
