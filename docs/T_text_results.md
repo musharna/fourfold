@@ -1,4 +1,10 @@
-# T_text results: why our Sol cells never write ASCII (complete, 2026-11-10)
+# T_text results: do our Sol cells write ASCII, and does the route matter? (updated 2026-11-10 13:45)
+
+**Bottom line (after full runs, stages 2–4 below):** the question's premise was wrong. Codex cells wrote English
+in 1 of 3 cued runs (seed 1003, all nine cells by t29). No route effect is shown: text in 2/2 bare-API vs 1/3
+codex cued runs (Fisher p = 0.4). Text looks like a founder event that happens in some runs and not others.
+
+## Stage 1: single-call replay (complete)
 
 Prereg: `prereg/T_text.md`. Data: `analysis/t_text/calls.jsonl`, `summary.tsv`. 360/360 calls valid
 (240 OpenRouter, all OpenAI-served, $3.82; 120 codex on Plus after one free reset).
@@ -38,5 +44,32 @@ text in both 128-bit Sol runs she describes, versus 0 of our 5. That fits "lucky
 composition) that compounds over 50 ticks. A single-call replay cannot see that. The test that decides it is full
 runs on erin's route (bare API), compared with our codex runs.
 
-**Next:** plant a scripted founder in full Sol runs (`prereg/P1_founder.md`) to test whether a founder
-alone makes our cells adopt and keep English.
+## Stages 2–4: full runs (cued prompt, 128-bit hex, same wiring per seed)
+| run | route | reasoning tokens/call (median, full run) | log words/call (median, t1–40) | cells writing English | first text | eval |
+|---|---|---|---|---|---|---|
+| erin sol-50 | OpenAI API | 512 | 54.5 | 9/9 | t6 | 0.597 |
+| API 1001 | OpenRouter → OpenAI, bare | 458 | 49 | 5/9 | t41 | 0.296 |
+| API 1002 | same | 421 | 50 | 6/9 | t12 | 0.280 |
+| API 1002, effort medium (stage 4, 30 ticks) | same | 67 | 44 (t1–30) | 0/9 | none | not run |
+| codex 1001 | codex exec | 223 | 37 | 0/9 | none | 0.288 |
+| codex 1002 | codex exec | 242 | 37 | 0/9 | none | 0.308 |
+| codex 1003 | codex exec | 320 | 38 | 9/9 | t24 | 0.298 |
+
+Codex no-cue runs (1001–1003): 0/9 text in all three.
+
+- **Codex 1003 (landed 11-10 11:41):** cell 0 sent "WHO? ID=38b1f9a3" at t24, a neighbor answered "ACK! ID=6774d88e"
+  at t25, and all nine cells were composing English by t29 ("ECHO Q0 …", "INPUTS? …", "…:PING").
+- **Withdrawn:** "codex never writes text" (it held for 5 runs and failed on the 6th), and with it the audit's
+  leading suspect that codex's lower reasoning budget suppresses text. Codex reasons about half as much per call
+  as the API (a real, measured difference), and wrote text anyway.
+- **Stage 4 stays ambiguous:** effort medium on the API gave no text in 30 ticks, but at 67 reasoning tokens it
+  sat far below codex, and bare 1001 needed 41 ticks at full effort.
+- **Stage 3 (codex, verbosity medium):** not run yet and no longer needed for the text question. Moved to the end
+  of the Codex queue; it would only measure log length.
+- **Open:** whether text is less likely per run on codex. 2/2 vs 1/3 cannot tell. A third bare-API seed (1003)
+  gives the pair for the run where codex did write text.
+- Stage 2 deviation and the stage 4 calibration are logged in `prereg/T_text.md`. OpenRouter is pinned to the
+  OpenAI provider; erin called api.openai.com directly.
+
+**Next:** scripted-founder runs (`prereg/P1_founder.md`). Note for reading them: on seed 1003 the no-founder
+control itself reaches 9/9 from t24, so a founder effect there can only show as earlier adoption.

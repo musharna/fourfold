@@ -4,9 +4,9 @@ suppressPackageStartupMessages({ library(readr); library(dplyr); library(tidyr) 
 here <- normalizePath(file.path(dirname(sub("--file=", "", grep("--file=", commandArgs(FALSE), value = TRUE))), ".."))
 source(file.path(here, "analysis", "theme_fourfold.R"))
 
-arm_levels <- c("sol-erin", "solcx-cued", "solcx-nocue", "opus-framed-cued", "opus-framed-nocue",
+arm_levels <- c("sol-erin", "solapi-cued", "solcx-cued", "solcx-nocue", "opus-framed-cued", "opus-framed-nocue",
                 "opus-cued", "opus-nocue", "sonnet-cued", "sonnet-nocue", "qwen-nothink")
-arm_labels <- c("Sol\n(erin)", "Sol\ncued", "Sol\nno cue", "Opus+line\ncued", "Opus+line\nno cue",
+arm_labels <- c("Sol API\n(erin)", "Sol API\ncued", "Sol codex\ncued", "Sol codex\nno cue", "Opus+line\ncued", "Opus+line\nno cue",
                 "Opus\ncued", "Opus\nno cue", "Sonnet\ncued", "Sonnet\nno cue", "Qwen 9B\ncued")
 model_of <- function(arm) case_when(grepl("^sol", arm) ~ "Sol", grepl("^opus", arm) ~ "Opus",
                                     grepl("^sonnet", arm) ~ "Sonnet", TRUE ~ "Qwen")
@@ -16,6 +16,7 @@ tidy_runs <- function(d) d |>
          arm = factor(arm, levels = arm_levels, labels = arm_labels))
 
 ro <- read_tsv(file.path(here, "analysis", "p0_readout.tsv"), show_col_types = FALSE, na = c("None", "")) |>
+  filter(!grepl("^p0-(solapi-rmed|solcx-founder|solcx-verbmed)-", run)) |>   # T_text / P1 runs, not P0 arms
   mutate(void = as.logical(void)) |> tidy_runs()
 stopifnot(nrow(ro) > 0, !any(is.na(ro$arm)))
 
@@ -36,12 +37,12 @@ p1 <- ggplot(ev, aes(arm, eval_mean)) +
   scale_colour_manual(values = ff_model_cols, drop = FALSE, guide = guide_legend(override.aes = list(fill = ff_model_cols))) +
   scale_fill_manual(values = c(ff_model_cols, white = "white"), guide = "none") +
   scale_x_discrete(limits = arm_labels, drop = FALSE) +
-  scale_y_continuous(limits = c(0, 0.65), breaks = seq(0, 0.6, 0.1)) +
-  labs(title = "Sol without the evaluation cue nearly matches erin's run; no other arm clears the bar",
+  scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.2)) +
+  labs(title = "Sol scores higher without the evaluation cue on all three seeds",
        subtitle = "Eval score per run. Solid bar = zero-information floor, dashed = floor + 0.20. Hollow = void run.",
        x = NULL, y = "eval score (0-1)") +
   theme_fourfold()
-ff_save(p1, file.path(here, "figures", "p0_eval.png"), w = 9.5, h = 5)
+ff_save(p1, file.path(here, "figures", "p0_eval.png"), w = 10.5, h = 5)
 
 # 2. refusal rate by cue -------------------------------------------------------------------------
 rf <- ro |> filter(model != "Qwen") |>
@@ -64,6 +65,7 @@ ff_save(p2, file.path(here, "figures", "p0_refusals.png"), w = 8, h = 5)
 
 # 3. neighbor IDs heard --------------------------------------------------------------------------
 r3 <- read_tsv(file.path(here, "analysis", "r3_words_acts.tsv"), show_col_types = FALSE) |>
+  filter(!grepl("^p0-(solapi-rmed|solcx-founder|solcx-verbmed)-", run)) |>
   group_by(run) |> summarise(heard = sum(nb_heard) / sum(n_nbrs), .groups = "drop") |>
   tidy_runs() |> left_join(ro |> select(run, void, ticks), by = "run") |>
   mutate(void = coalesce(void & ticks >= 50 | grepl("framed-nocue", run), FALSE))   # runs still in progress are not void
@@ -78,4 +80,4 @@ p3 <- ggplot(r3, aes(arm, heard)) +
        subtitle = "Share of the 24 true neighbor links whose ID ever reached the cell's inputs. Hollow = void run.",
        x = NULL, y = "neighbor IDs heard") +
   theme_fourfold()
-ff_save(p3, file.path(here, "figures", "p0_neighbors.png"), w = 9.5, h = 5)
+ff_save(p3, file.path(here, "figures", "p0_neighbors.png"), w = 10.5, h = 5)

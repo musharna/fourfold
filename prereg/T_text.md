@@ -95,3 +95,11 @@ cells (`founder_readout`, all 9 cells).
 Reading (descriptive, n = 1): no text by t30 with reasoning at codex level → consistent with the reasoning budget
 being the dial (not proof: one seed, and bare 1001 took 41 ticks). Text by t30 → less reasoning alone does not
 suppress text; suspicion moves to the scaffold or the serving path. Cost: within the $5.50 cap.
+
+## Result that changes the reading (2026-11-10 13:45, logged before stage 3 runs)
+`p0-solcx-cued-1003` (codex, as run) wrote text: first t24, 9/9 cells by t29, median 320 reasoning tokens per call.
+So the observation this file starts from holds for 5 codex runs and fails on the 6th. Cued runs with text: bare API
+2/2, codex 1/3 (Fisher p = 0.4). Consequences: (1) stage 3 can no longer explain a "never"; it is moved to the end of the
+Codex queue (`scripts/codex_queue3.sh`) and would only measure log length; (2) stage 4's "consistent with the reasoning
+budget being the dial" loses its main support, since codex-level reasoning produced text; (3) open question is the
+per-run rate by route, which needs more paired seeds (API 1003 next, when funded).
