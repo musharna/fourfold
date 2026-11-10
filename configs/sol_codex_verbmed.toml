@@ -1,0 +1,9 @@
+# T_text stage 3: the P0 Sol cued codex arm with codex's forced verbosity=low lifted to medium (the one codex knob that
+# differs from erin's route and can be changed). paired with p0-solcx-cued-1001 (codex, low) and p0-solapi-cued-1001 (API).
+agent = "codex-cli"
+ticks = 50
+[codex_cli]
+model = "gpt-6.1-sol"
+effort = "high"
+max_concurrency = 9
+extra_args = ["-c", "model_verbosity=medium"]

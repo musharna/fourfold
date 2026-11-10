@@ -62,3 +62,12 @@ Readouts: cells with text output (is_text L=10), first text tick, cells composin
 (`founder_readout.readout`, no founder), eval vs the paired codex run.
 Reading (descriptive, n <= 2): text in an API run when the paired codex run had none favors a trajectory-level
 route effect. No text in API runs by t30 favors the "rare founder" reading.
+
+## Stage 3 (frozen 2026-11-10 03:00, before the first call): does codex's low verbosity explain the gap?
+Seed 1001 pair: API route text 5/9 (founder t41), codex route 0/9. Codex cells wrote ~25% shorter logs from t1
+(31 vs 43 words/tick t1-5; erin 45) and tried fewer distinct port values (461 vs 597, t1-40).
+Run `configs/sol_codex_verbmed.toml` (codex + model_verbosity=medium), world seed 1001.
+Readouts: log words/tick (t1-5, t1-40), distinct outputs t1-40, text cells and first text tick, eval.
+Reading (descriptive, n = 1): logs and distinct outputs move to the API values AND text appears → verbosity is the dial.
+Logs move but no text → verbosity explains the style gap but not the text (scaffolding or chance).
+Logs don't move → verbosity isn't what shortens them.
