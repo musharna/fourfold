@@ -1061,7 +1061,7 @@ async def run(path: Path, meta: dict, states: list[AgentState], start: int, end:
                 except (OSError, ValueError):
                     pass
                 errs = [e for a in rec["agents"] for e in a["errors"]]
-                lim = [e for e in errs if "usage limit" in e]
+                lim = [e for e in errs if "usage limit" in e or "402 Payment Required" in e]   # out of quota or credit: stop, don't degrade
                 if lim:
                     sys.exit(f"stopping after tick {t}: {lim[0][:300]}\n{resume_hint}")
                 streak = streak + 1 if bad == len(rec["agents"]) else 0
