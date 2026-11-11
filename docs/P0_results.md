@@ -36,12 +36,23 @@ call failed and no state changed (1–3 per run); without those ticks, 99.3–10
 
 Zero-information floors (quiz at tick 0): cued 0.089 on seeds 1001, 1002 and 1003; no-cue 0.046 (1002), 0.081 (1003).
 
-## Follow-up (P1_founder, seed 1001 of 3; `analysis/founder_readout.tsv`)
-One scripted cell sent erin's "ECHO Qj NOW!" at t6–12. 6 of the 8 Sol cells then composed their own English (first
-t14; 5 still at t30–50), and the 8 cells scored 0.558 vs 0.287 for the same cells in the run without a founder
-(count 0.83 vs 0.50, arrangement 0.50 vs 0.00, position 0.50 vs 0.12, map 0.10 vs 0.00; far IDs named 25 vs 8).
-One seed. Against a simple "English raises the score": codex seed 1003 found English unaided at t24 and scored 0.298.
+## Follow-up (P1_founder, 3 seeds; `analysis/founder_readout.tsv`)
+One scripted cell sent erin's "ECHO Qj NOW!" at t6–12. All three runs valid (95.1/98.2/96.2% error-free).
+
+| seed | composed own English (of 8) | still at t30–50 | first composed | eval, founder | eval, same cells without founder | far IDs heard per cell |
+|---|---|---|---|---|---|---|
+| 1001 | 6 | 5 | t14 | 0.558 | 0.287 | 3.4 |
+| 1002 | 6 | 4 | t11 | 0.230 (0.263 over the 7 answered) | 0.324 | 2.0 |
+| 1003 | 8 | 8 | t9 | 0.540 | 0.302 | 3.6 |
+
+**Verdict (frozen rule): a founder is enough for adoption** (R2 ≥ 4/8 and R3 in 3 of 3 seeds). The score rose on two
+seeds and not on the third: seed 1002 adopted English (6/8) and scored below its no-founder pair (count 0.54,
+arrangement, position and map all 0.00). One quiz answer in 1002 was lost to a Codex transport error and counts as 0.
+So English spreading does not by itself raise the score. Relaying is a partial account at best: 1002 heard 2.0 far IDs
+per cell, above the no-founder runs (0.1–1.0) and above erin's run (1.8, score 0.60), yet scored 0.23; over these six
+runs rho(far heard, score) is 0.37. Caveat on 1003: its no-founder pair found English unaided at t24.
+Sham-founder control (seed 1001, prereg addendum) is running.
 
 ## Not yet done
-Founder seeds 1002/1003 (running); a third bare-API seed (1003, needs ~$8 OpenRouter credit); framed-Sol check; redact the account email in
+Sham-founder control (running); a third bare-API seed (1003, needs ~$8 OpenRouter credit); framed-Sol check; redact the account email in
 `runs/p0-opus-framed-nocue-1001/ticks.jsonl` before anything is published.

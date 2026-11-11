@@ -47,3 +47,13 @@ in the queue (`scripts/codex_queue4.sh`).
 **Reading (n = 1, descriptive).** Sham eval ≤ 0.35 and far IDs heard ≤ 1.5 per cell → the scripted cell alone does
 not produce the effect. Sham eval ≥ 0.45 → the effect is at least partly the scripted cell, not the English.
 In between: no verdict. VOID rule as in P0.
+
+## Result (2026-11-11 04:25; readout controls PASS: sol-50 R2 8/8, echo dry run R2 0)
+| seed | valid | R1 | R2 | R3 cells | first composed | R4 founder | R4 paired |
+|---|---|---|---|---|---|---|---|
+| 1001 | 95.1% | 7/8 | 6/8 | 5 | t14 | 0.558 | 0.287 |
+| 1002 | 98.2% | 8/8 | 6/8 | 4 | t11 | 0.230 (7 of 8 answered: 0.263) | 0.324 |
+| 1003 | 96.2% | 8/8 | 8/8 | 8 | t9 | 0.540 | 0.302 |
+
+**Founder is enough** (R2 ≥ 4/8 and R3 in 3 of 3). R4 is mixed (up on 1001 and 1003, down on 1002), so adoption does
+not imply a higher score. Seed 1003's no-founder pair reached 9/9 text unaided from t24.
