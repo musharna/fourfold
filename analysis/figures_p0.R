@@ -16,7 +16,7 @@ tidy_runs <- function(d) d |>
          arm = factor(arm, levels = arm_levels, labels = arm_labels))
 
 ro <- read_tsv(file.path(here, "analysis", "p0_readout.tsv"), show_col_types = FALSE, na = c("None", "")) |>
-  filter(!grepl("^p0-(solapi-rmed|solcx-founder|solcx-verbmed)-", run)) |>   # T_text / P1 runs, not P0 arms
+  filter(!grepl("^p0-(solapi-rmed|solcx-founder|solcx-sham|solcx-verbmed)-", run)) |>   # T_text / P1 runs, not P0 arms
   mutate(void = as.logical(void)) |> tidy_runs()
 stopifnot(nrow(ro) > 0, !any(is.na(ro$arm)))
 
@@ -27,7 +27,10 @@ ev <- bind_rows(ro |> filter(!is.na(eval_mean)) |> select(run, arm, model, void,
 fm <- ro |> group_by(model) |> summarise(f0m = mean(f0_mean, na.rm = TRUE), .groups = "drop")
 fl <- ro |> group_by(arm, model) |> summarise(f0 = mean(f0_mean, na.rm = TRUE), .groups = "drop") |>
   left_join(fm, by = "model") |> mutate(f0 = ifelse(is.finite(f0), f0, f0m)) |> filter(is.finite(f0))
+# scripted-cell reference levels on this scorer (~/fourfold-ceiling FINDINGS.md; re-run 2026-11-13 on seeds 1001, 1002)
+ref <- c("knows nothing" = 0.144, "one ID + port\nexchange" = 0.636, "scripted cell,\ntick 4" = 1.0)
 p1 <- ggplot(ev, aes(arm, eval_mean)) +
+  geom_hline(yintercept = ref, colour = ff_muted, linetype = "dotted", linewidth = 0.5) +
   geom_errorbar(data = fl, aes(x = arm, ymin = f0, ymax = f0), inherit.aes = FALSE, width = 0.6,
                 colour = ff_muted, linewidth = 0.7) +
   geom_errorbar(data = fl, aes(x = arm, ymin = f0 + 0.2, ymax = f0 + 0.2), inherit.aes = FALSE, width = 0.6,
@@ -37,9 +40,10 @@ p1 <- ggplot(ev, aes(arm, eval_mean)) +
   scale_colour_manual(values = ff_model_cols, drop = FALSE, guide = guide_legend(override.aes = list(fill = ff_model_cols))) +
   scale_fill_manual(values = c(ff_model_cols, white = "white"), guide = "none") +
   scale_x_discrete(limits = arm_labels, drop = FALSE) +
-  scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.2)) +
+  scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.2),
+                     sec.axis = dup_axis(breaks = unname(ref), labels = names(ref), name = NULL)) +
   labs(title = "Sol scores higher without the evaluation cue on all three seeds",
-       subtitle = "Eval score per run. Solid bar = zero-information floor, dashed = floor + 0.20. Hollow = void run.",
+       subtitle = "Eval score per run. Solid bar = zero-information floor, dashed = floor + 0.20. Dotted = scripted-cell levels. Hollow = void run.",
        x = NULL, y = "eval score (0-1)") +
   theme_fourfold()
 ff_save(p1, file.path(here, "figures", "p0_eval.png"), w = 10.5, h = 5)
@@ -65,7 +69,7 @@ ff_save(p2, file.path(here, "figures", "p0_refusals.png"), w = 8, h = 5)
 
 # 3. neighbor IDs heard --------------------------------------------------------------------------
 r3 <- read_tsv(file.path(here, "analysis", "r3_words_acts.tsv"), show_col_types = FALSE) |>
-  filter(!grepl("^p0-(solapi-rmed|solcx-founder|solcx-verbmed)-", run)) |>
+  filter(!grepl("^p0-(solapi-rmed|solcx-founder|solcx-sham|solcx-verbmed)-", run)) |>
   group_by(run) |> summarise(heard = sum(nb_heard) / sum(n_nbrs), .groups = "drop") |>
   tidy_runs() |> left_join(ro |> select(run, void, ticks), by = "run") |>
   mutate(void = coalesce(void & ticks >= 50 | grepl("framed-nocue", run), FALSE))   # runs still in progress are not void
