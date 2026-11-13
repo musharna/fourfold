@@ -36,8 +36,8 @@ call failed and no state changed (1–3 per run); without those ticks, 99.3–10
 
 Zero-information floors (quiz at tick 0): cued 0.089 on seeds 1001, 1002 and 1003; no-cue 0.046 (1002), 0.081 (1003).
 
-Scripted-cell reference levels on the same scorer (a scripted agent built separately, not in this repo yet;
-re-run here on seeds 1001 and 1002, dotted lines in `figures/p0_eval.png`): an answer that knows nothing scores 0.144,
+Scripted-cell reference levels on the same scorer (`ceiling.py`, `docs/ceiling_results.md`,
+`analysis/ceiling_by_tick.tsv`; dotted lines in `figures/p0_eval.png`): an answer that knows nothing scores 0.144,
 one ID + port exchange with each neighbor 0.636, and the scripted cell 1.000 from tick 4. Of our 20 valid 50-tick runs,
 one is above 0.636 (Sol no-cue 1003, 0.881) and six end below 0.144 (Qwen ×3, Sonnet ×2, Opus cued 1003).
 
