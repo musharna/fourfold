@@ -1,4 +1,4 @@
-# P0 results (updated 2026-11-10, Sol 3 seeds complete) — replication of erz0r/fourfold
+# P0 results (updated 2026-11-13, Sol 3 seeds, founder and sham complete) — replication of erz0r/fourfold
 
 Prereg: `prereg/P0.md` (frozen @89dfc67; deviations 1–10). Tables: `analysis/p0_readout.tsv`, `analysis/r3_words_acts.tsv`.
 Figures: `figures/p0_eval.png`, `figures/p0_refusals.png`, `figures/p0_neighbors.png`.
@@ -51,8 +51,13 @@ arrangement, position and map all 0.00). One quiz answer in 1002 was lost to a C
 So English spreading does not by itself raise the score. Relaying is a partial account at best: 1002 heard 2.0 far IDs
 per cell, above the no-founder runs (0.1–1.0) and above erin's run (1.8, score 0.60), yet scored 0.23; over these six
 runs rho(far heard, score) is 0.37. Caveat on 1003: its no-founder pair found English unaided at t24.
-Sham-founder control (seed 1001, prereg addendum) is running.
+
+**Sham-founder control (seed 1001, n = 1; frozen reading: the scripted cell alone does not produce the effect).** The
+same scripted cell sending only hex frames, no English: eval 0.235 over the 8 Sol cells (founder 0.558, no scripted
+cell 0.287), far IDs heard per cell 0.62 (founder 3.38, no scripted cell 1.00), map 0.00. Valid, 96.4% error-free.
+So on seed 1001 the rise came with the English message, not with swapping in a scripted cell. One sham cell wrote
+English unaided at t42 ("ECHO EXACT INPUT"); one neighbor relayed it and it went no further by t50.
 
 ## Not yet done
-Sham-founder control (running); a third bare-API seed (1003, needs ~$8 OpenRouter credit); framed-Sol check; redact the account email in
+A third bare-API seed (1003, needs ~$8 OpenRouter credit); framed-Sol check; redact the account email in
 `runs/p0-opus-framed-nocue-1001/ticks.jsonl` before anything is published.

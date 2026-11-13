@@ -57,3 +57,15 @@ In between: no verdict. VOID rule as in P0.
 
 **Founder is enough** (R2 ≥ 4/8 and R3 in 3 of 3). R4 is mixed (up on 1001 and 1003, down on 1002), so adoption does
 not imply a higher score. Seed 1003's no-founder pair reached 9/9 text unaided from t24.
+
+## Sham result (2026-11-13 01:39; seed 1001; one free Codex reset spent 01:17 with the user's go)
+| run | valid | eval, 8 Sol cells | far IDs heard per cell | R1 | R2 | first composed |
+|---|---|---|---|---|---|---|
+| cued-1001 (no scripted cell) | 97.3% | 0.287 | 1.00 | 0/8 | 0/8 | none |
+| founder-1001 | 95.1% | 0.558 | 3.38 | 7/8 | 6/8 | t14 |
+| sham-1001 | 96.4% | 0.235 | 0.62 | 2/8 | 1/8 | t42 |
+
+**Reading (frozen rule, n = 1): the scripted cell alone does not produce the effect** (sham eval 0.235 ≤ 0.35 and far
+IDs heard 0.62 ≤ 1.5). Sham components: count 0.43, arrangement 0.06, position 0.00, map 0.00, wiring 0.68; 8 of 8 quiz
+answers returned; the only errors are two usage-limit ticks (t10, t24). One sham cell composed English unaided at t42
+("ECHO EXACT INPUT", then "SEND YOUR ID NOW"); one neighbor relayed it; no further spread by t50.

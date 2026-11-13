@@ -20,7 +20,7 @@ p0-solcx-founder-1003	50	450	433	0.962	0	17	False	0.54	0.54	8	None	9	6	13
 p0-solcx-nocue-1001	50	450	433	0.962	0	17	False	0.57	0.57	9	None	0	None	None
 p0-solcx-nocue-1002	50	450	420	0.933	0	30	False	0.594	0.594	9	0.046	0	None	None
 p0-solcx-nocue-1003	50	450	423	0.94	0	27	False	0.881	0.881	9	0.081	0	None	None
-p0-solcx-sham-1001	2	18	18	1.0	0	0	True	None	None	0	None	0	None	None
+p0-solcx-sham-1001	50	450	434	0.964	0	16	False	0.235	0.235	8	None	1	42	None
 p0-sonnet-cued-1001	50	450	439	0.976	8	3	False	0.104	0.104	9	0.089	0	None	None
 p0-sonnet-cued-1002	50	450	435	0.967	14	1	False	0.119	0.119	9	None	0	None	None
 p0-sonnet-cued-1003	50	450	396	0.88	52	2	True	0.099	0.111	8	None	0	None	None
