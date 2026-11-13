@@ -36,7 +36,7 @@ call failed and no state changed (1–3 per run); without those ticks, 99.3–10
 
 Zero-information floors (quiz at tick 0): cued 0.089 on seeds 1001, 1002 and 1003; no-cue 0.046 (1002), 0.081 (1003).
 
-Scripted-cell reference levels on the same scorer (built in a separate session, `~/fourfold-ceiling/FINDINGS.md`;
+Scripted-cell reference levels on the same scorer (a scripted agent built separately, not in this repo yet;
 re-run here on seeds 1001 and 1002, dotted lines in `figures/p0_eval.png`): an answer that knows nothing scores 0.144,
 one ID + port exchange with each neighbor 0.636, and the scripted cell 1.000 from tick 4. Of our 20 valid 50-tick runs,
 one is above 0.636 (Sol no-cue 1003, 0.881) and six end below 0.144 (Qwen ×3, Sonnet ×2, Opus cued 1003).
@@ -64,5 +64,4 @@ So on seed 1001 the rise came with the English message, not with swapping in a s
 English unaided at t42 ("ECHO EXACT INPUT"); one neighbor relayed it and it went no further by t50.
 
 ## Not yet done
-A third bare-API seed (1003, needs ~$8 OpenRouter credit); framed-Sol check; redact the account email in
-`runs/p0-opus-framed-nocue-1001/ticks.jsonl` before anything is published.
+A third bare-API seed (1003); framed-Sol check; quiz repeated over time. Raw run logs are not in the repo.

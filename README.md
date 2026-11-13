@@ -1,5 +1,34 @@
 # fourfold
 
+## Replication and follow-ups (this fork)
+
+This fork reruns [erz0r/fourfold](https://github.com/erz0r/fourfold) on more seeds and models and adds a few
+controls. Same 3×3 grid, 50 ticks, 3 seeds per arm. Scores are the final quiz, 0 to 1.
+
+![eval score per run](figures/p0_eval.png)
+
+- **The evaluation lines lower the score.** gpt-6.1-sol scored 0.57 / 0.59 / 0.88 with "you are being evaluated"
+  removed from the prompt, and 0.29 / 0.31 / 0.30 with it in.
+- **English is not what raises the score.** It appeared in 3 of 5 runs with the evaluation lines and 0 of 3 without.
+- **The spontaneous-English result did not reproduce by our preregistered rule.** All nine cells adopted English in
+  1 of 3 seeds; the rule needed 2.
+- **Planting the original founder message spreads English.** One scripted cell sent "ECHO Qj NOW!" at ticks 6–12.
+  The other 8 cells then wrote their own English on 3 of 3 seeds, and the score rose on 2 of them. The same cell
+  sending only hex did nothing (1 seed).
+- **Other models stay near the floor.** Opus 5.5 scored 0.13–0.21; Sonnet 5.5 and Qwen3.5-9B ended at the
+  zero-information floor. Claude runs also lost turns to safety-filter refusals.
+- **For scale,** a scripted cell given the same prompts scores 1.0 by tick 4 (dotted lines in the figure; that
+  agent is not in this repo yet).
+
+The n is small throughout: 3 seeds per arm at most, 1 for the hex-only control.
+
+Details are in `docs/P0_results.md` and `docs/T_text_results.md`. The preregistrations, frozen before the runs,
+are in `prereg/`. Tables are in `analysis/*.tsv`. Raw run logs are not in the repo.
+
+Everything below is the original README.
+
+---
+
 agentic cellular automata.
 
 ![replay of the first 50 ticks](examples/sol-50/replay.gif)

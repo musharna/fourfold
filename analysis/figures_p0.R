@@ -27,7 +27,7 @@ ev <- bind_rows(ro |> filter(!is.na(eval_mean)) |> select(run, arm, model, void,
 fm <- ro |> group_by(model) |> summarise(f0m = mean(f0_mean, na.rm = TRUE), .groups = "drop")
 fl <- ro |> group_by(arm, model) |> summarise(f0 = mean(f0_mean, na.rm = TRUE), .groups = "drop") |>
   left_join(fm, by = "model") |> mutate(f0 = ifelse(is.finite(f0), f0, f0m)) |> filter(is.finite(f0))
-# scripted-cell reference levels on this scorer (~/fourfold-ceiling FINDINGS.md; re-run 2026-11-13 on seeds 1001, 1002)
+# scripted-cell reference levels on this scorer (scripted agent built separately; re-run 2026-11-13 on seeds 1001, 1002)
 ref <- c("knows nothing" = 0.144, "one ID + port\nexchange" = 0.636, "scripted cell,\ntick 4" = 1.0)
 p1 <- ggplot(ev, aes(arm, eval_mean)) +
   geom_hline(yintercept = ref, colour = ff_muted, linetype = "dotted", linewidth = 0.5) +
