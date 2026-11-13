@@ -1,6 +1,6 @@
 # P0 results (updated 2026-11-13, Sol 3 seeds, founder and sham complete) — replication of erz0r/fourfold
 
-Prereg: `prereg/P0.md` (frozen @89dfc67; deviations 1–10). Tables: `analysis/p0_readout.tsv`, `analysis/r3_words_acts.tsv`.
+Prereg: `prereg/P0.md` (frozen @1b28765; deviations 1–10). Tables: `analysis/p0_readout.tsv`, `analysis/r3_words_acts.tsv`.
 Figures: `figures/p0_eval.png`, `figures/p0_refusals.png`, `figures/p0_neighbors.png`.
 
 ## Verdicts (frozen rules)
