@@ -23,6 +23,12 @@ controls. Same 3×3 grid, 50 ticks, 3 seeds per arm. Scores are the final quiz, 
 
 The n is small throughout: 3 seeds per arm at most, 1 for the hex-only control.
 
+![replay of seed 1003 with the evaluation lines](figures/replay_solcx_cued_1003.gif)
+
+The one seed where all nine cells adopted English on their own (gpt-6.1-sol with the evaluation lines, seed 1003),
+drawn with the original viewer. The first English message is at tick 24 and all nine cells use it by tick 29; the
+replay slows down there.
+
 Details are in `docs/P0_results.md`, `docs/T_text_results.md` and `docs/ceiling_results.md`. The
 preregistrations, frozen before the runs, are in `prereg/`. Tables are in `analysis/*.tsv`. Raw run logs are not
 in the repo.
