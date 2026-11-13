@@ -17,13 +17,15 @@ controls. Same 3×3 grid, 50 ticks, 3 seeds per arm. Scores are the final quiz, 
   sending only hex did nothing (1 seed).
 - **Other models stay near the floor.** Opus 5.5 scored 0.13–0.21; Sonnet 5.5 and Qwen3.5-9B ended at the
   zero-information floor. Claude runs also lost turns to safety-filter refusals.
-- **For scale,** a scripted cell given the same prompts scores 1.0 by tick 4 (dotted lines in the figure; that
-  agent is not in this repo yet).
+- **For scale,** a scripted cell given the same prompts scores 1.0 by tick 4, the earliest any cell can (dotted
+  lines in the figure). With 4-bit ports it needs 98 ticks. The agent is `ceiling.py`; run it with
+  `agent = "ceiling"`.
 
 The n is small throughout: 3 seeds per arm at most, 1 for the hex-only control.
 
-Details are in `docs/P0_results.md` and `docs/T_text_results.md`. The preregistrations, frozen before the runs,
-are in `prereg/`. Tables are in `analysis/*.tsv`. Raw run logs are not in the repo.
+Details are in `docs/P0_results.md`, `docs/T_text_results.md` and `docs/ceiling_results.md`. The
+preregistrations, frozen before the runs, are in `prereg/`. Tables are in `analysis/*.tsv`. Raw run logs are not
+in the repo.
 
 Everything below is the original README.
 

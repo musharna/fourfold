@@ -9,6 +9,12 @@ ff_muted <- "#57606a"
 # one color per model family; conditions are shown by shape/fill, not color
 ff_model_cols <- c(Sol = "#2f6f9f", Opus = "#c4622d", Sonnet = "#d4a21f", Qwen = "#6a4c93")
 
+# scripted-ceiling figures: what the scripted cell achieved, the bound no cell can beat, a reference run length
+ff_ceiling_cols <- c("Scripted cell (achieved)" = ff_ink, "Limit for any cell" = "#c4622d",
+                     "Length of the original 4-bit model run" = "#2f6f9f")
+ff_ceiling_shapes <- c("Scripted cell (achieved)" = 16, "Limit for any cell" = 4,
+                       "Length of the original 4-bit model run" = 17)
+
 theme_fourfold <- function(base_size = 12) {
   theme_minimal(base_size = base_size) %+replace%
     theme(
