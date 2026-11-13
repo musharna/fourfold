@@ -518,6 +518,19 @@ class ScriptedAgent:
         pass
 
 
+class CeilingAgent:
+    """scripted upper reference (ceiling.py). it is handed the same two strings as every model
+    cell, the system prompt and the tick or quiz prompt, and nothing else. unlike "scripted" cells
+    it reads its inputs and it is quizzed by eval.py."""
+
+    async def act(self, turn: Turn) -> Reply:
+        import ceiling
+        return Reply(raw=ceiling.respond(turn.system, turn.prompt))
+
+    async def close(self):
+        pass
+
+
 class LLMAgent:
     """one stateless chat completion per agent per tick. memory lives only in
     the protocol and the log tail that the tick prompt shows back."""
@@ -824,6 +837,8 @@ def make_agent(cfg: dict):
         return CodexCLIAgent(cfg["codex_cli"])
     if cfg["agent"] == "scripted":
         return ScriptedAgent(cfg.get("scripted") or {})
+    if cfg["agent"] == "ceiling":
+        return CeilingAgent()
     sys.exit(f"config: unknown agent kind {cfg['agent']!r}")
 
 
@@ -1106,7 +1121,7 @@ def main():
     ap.add_argument("--ticks", type=int, help="run until this tick number")
     ap.add_argument("--run-id", help="name for a new run")
     ap.add_argument("--resume", metavar="RUN", help="run id or path of a run to continue")
-    ap.add_argument("--agent", choices=["llm", "anthropic", "claude-cli", "codex-cli", "echo"], help="override agent kind for a new run")
+    ap.add_argument("--agent", choices=["llm", "anthropic", "claude-cli", "codex-cli", "echo", "ceiling"], help="override agent kind for a new run")
     ap.add_argument("--world-seed", type=int, help="override world seed for a new run")
     ap.add_argument("--view", action="store_true", help="also open the viewer, following this run live")
     args = ap.parse_args()
